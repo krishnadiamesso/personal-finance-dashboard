@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Page } from "./types/navigation.ts";
 import Sidebar from "./components/Sidebar.tsx";
 import Header from "./components/Header.tsx";
@@ -25,13 +25,19 @@ const pageSubTitles: Record<Page, string> = {
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  const closeSidebar = useCallback(() => {
+    setIsSidebarOpen(false);
+    menuButtonRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     if (!isSidebarOpen) return;
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setIsSidebarOpen(false);
+        closeSidebar();
       }
     }
 
@@ -40,7 +46,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, closeSidebar]);
 
   return (
     <div className="flex min-h-screen bg-slate-100">
@@ -48,23 +54,24 @@ function App() {
         currentPage={currentPage}
         onNavigate={(page) => {
           setCurrentPage(page);
-          setIsSidebarOpen(false);
+          closeSidebar();
         }}
         isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
+        onClose={closeSidebar}
       />
 
       {isSidebarOpen && (
         <button
           type="button"
           aria-label="Close navigation"
-          onClick={() => setIsSidebarOpen(false)}
+          onClick={closeSidebar}
           className="fixed inset-0 z-40 bg-black/50 md:hidden"
         />
       )}
 
       <main className="min-w-0 flex-1 p-4 md:p-8">
         <button
+          ref={menuButtonRef}
           type="button"
           onClick={() => setIsSidebarOpen(true)}
           aria-label="Open navigation"

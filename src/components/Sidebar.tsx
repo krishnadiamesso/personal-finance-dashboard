@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import type { Page } from "../types/navigation.ts";
+import { useEffect, useRef } from "react";
 
 interface SidebarProps {
   currentPage: Page;
@@ -27,13 +28,27 @@ const navigationItems = [
 ] as const;
 
 export default function Sidebar({ currentPage, onNavigate, isOpen, onClose }: SidebarProps) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      closeButtonRef.current?.focus();
+    }
+  }, [isOpen]);
+
   return (
     <aside
       id="mobile-sidebar"
       className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 p-4 text-white transition-transform duration-300
-    md:static md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+    md:static md:visible md:translate-x-0 ${isOpen ? "visible translate-x-0" : "invisible -translate-x-full"}`}
     >
-      <button type="button" onClick={onClose} aria-label="Close navigation" className="md:hidden">
+      <button
+        ref={closeButtonRef}
+        type="button"
+        onClick={onClose}
+        aria-label="Close navigation"
+        className="md:hidden"
+      >
         <X size={24} />
       </button>
       <div className="mb-8 text-2xl font-bold">FinTrack</div>
