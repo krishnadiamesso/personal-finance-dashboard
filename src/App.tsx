@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Page } from "./types/navigation.ts";
 import Sidebar from "./components/Sidebar.tsx";
+import Header from "./components/Header.tsx";
 
 const pageTitles: Record<Page, string> = {
   dashboard: "Dashboard",
@@ -11,6 +12,15 @@ const pageTitles: Record<Page, string> = {
   goals: "Goals",
 };
 
+const pageSubTitles: Record<Page, string> = {
+  dashboard: "Overview of your finances",
+  transactions: "Manage your income and expenses",
+  budgets: "Track your monthly spending limits",
+  analytics: "Understand your spending patterns",
+  settings: "Customize your preferences",
+  goals: "Track your financial goals",
+};
+
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
 
@@ -19,9 +29,7 @@ function App() {
       <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
 
       <main className="min-w-0 flex-1 p-8">
-        <h1 className="text-3xl font-bold text-slate-900">{pageTitles[currentPage]}</h1>
-
-        <p className="mt-2 text-slate-600">Welcome to your personal finance dashboard</p>
+        <Header title={pageTitles[currentPage]} subtitle={pageSubTitles[currentPage]} />
       </main>
     </div>
   );
