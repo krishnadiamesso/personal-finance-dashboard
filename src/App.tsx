@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Page } from "./types/navigation.ts";
 import Sidebar from "./components/Sidebar.tsx";
 import Header from "./components/Header.tsx";
@@ -25,6 +25,22 @@ const pageSubTitles: Record<Page, string> = {
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isSidebarOpen) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsSidebarOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSidebarOpen]);
 
   return (
     <div className="flex min-h-screen bg-slate-100">
