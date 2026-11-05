@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Settings,
   Wallet,
+  X,
 } from "lucide-react";
 
 import type { Page } from "../types/navigation.ts";
@@ -12,6 +13,8 @@ import type { Page } from "../types/navigation.ts";
 interface SidebarProps {
   currentPage: Page;
   onNavigate: (page: Page) => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 const navigationItems = [
@@ -23,9 +26,16 @@ const navigationItems = [
   { id: "goals", label: "Goals", icon: Goal },
 ] as const;
 
-export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
+export default function Sidebar({ currentPage, onNavigate, isOpen, onClose }: SidebarProps) {
   return (
-    <aside className="w-64 min-h-screen bg-slate-900 p-4 text-white">
+    <aside
+      id="mobile-sidebar"
+      className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 p-4 text-white transition-transform duration-300
+    md:static md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+    >
+      <button type="button" onClick={onClose} aria-label="Close navigation" className="md:hidden">
+        <X size={24} />
+      </button>
       <div className="mb-8 text-2xl font-bold">FinTrack</div>
       <nav aria-label="Main navigation" className="space-y-2">
         {navigationItems.map((item) => {
