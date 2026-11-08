@@ -25,31 +25,50 @@ export default function IncomeExpenseChart() {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
+            barGap={8}
+            barCategoryGap="30%"
             margin={{
               top: 20,
-              right: 30,
-              left: 20,
+              right: 20,
+              left: 0,
               bottom: 5,
             }}
           >
             {/* Grid lines background */}
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
 
             {/* X Axis bound to the 'month' property of the dataset */}
-            <XAxis dataKey="month" tickLine={false} axisLine={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: "#64748b", fontSize: 12 }}
+            />
 
             {/* Y Axis automatically scales based on data values */}
-            <YAxis tickLine={false} axisLine={false} />
+            <YAxis tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
 
             {/* Interactive hover tooltip */}
             <Tooltip cursor={{ fill: "rgba(0, 0, 0, 0.05)" }} />
 
             {/* Chart legend */}
-            <Legend />
+            <Legend position="bottom" height={36} iconType="circle" />
 
             {/* Bar Data Series */}
-            <Bar dataKey="income" fill="#4f46e5" radius={[4, 4, 0, 0]} name="Income ($)" />
-            <Bar dataKey="expenses" fill="#f97316" radius={[4, 4, 0, 0]} name="Expenses ($)" />
+            <Bar
+              dataKey="income"
+              fill="#6366f1"
+              maxBarSize={36}
+              radius={[5, 5, 0, 0]}
+              name="Income"
+            />
+            <Bar
+              dataKey="expenses"
+              fill="#14b8a6"
+              maxBarSize={36}
+              radius={[5, 5, 0, 0]}
+              name="Expenses"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
