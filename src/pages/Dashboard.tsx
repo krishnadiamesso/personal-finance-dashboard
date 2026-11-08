@@ -8,6 +8,7 @@ import {
 import { mockTransactions } from "../data/mockData.ts";
 import StatCard from "../components/StatCard.tsx";
 import { formatCurrency } from "../utils/currency.ts";
+import IncomeExpenseChart from "../components/IncomeExpenseChart.tsx";
 
 type DashboardMetric = "Balance" | "Total Income" | "Total Expenses" | "Savings Rate";
 
@@ -31,10 +32,16 @@ export default function Dashboard() {
   ];
 
   return (
-    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {cards.map((card) => (
-        <StatCard key={card.title} title={card.title} value={card.value} icon={card.icon} />
-      ))}
-    </section>
+    <div className="space-y-6">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {cards.map((card) => (
+          <StatCard key={card.title} title={card.title} value={card.value} icon={card.icon} />
+        ))}
+      </section>
+
+      <section aria-label="Finance Charts">
+        <IncomeExpenseChart />
+      </section>
+    </div>
   );
 }
