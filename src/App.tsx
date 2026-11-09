@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar.tsx";
 import Header from "./components/Header.tsx";
 import { Menu } from "lucide-react";
 import Dashboard from "./pages/Dashboard.tsx";
+import Transactions from "./pages/Transactions.tsx";
 
 const pageTitles: Record<Page, string> = {
   dashboard: "Dashboard",
@@ -84,6 +85,7 @@ function App() {
         </button>
         <Header title={pageTitles[currentPage]} subtitle={pageSubTitles[currentPage]} />
         {currentPage === "dashboard" && <Dashboard />}
+        {currentPage === "transactions" && <Transactions />}
       </main>
     </div>
   );
