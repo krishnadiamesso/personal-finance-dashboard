@@ -8,15 +8,49 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { Transaction } from "../types/transaction.ts";
 
-const data = [
-  { month: "Aug", income: 4800, expenses: 3100 },
-  { month: "Sep", income: 5200, expenses: 2900 },
-  { month: "Oct", income: 6000, expenses: 3450 },
-  { month: "Nov", income: 5000, expenses: 2300 },
-];
+interface IncomeExpenseChartProps {
+  transactions: Transaction[];
+}
 
-export default function IncomeExpenseChart() {
+interface MonthlyTotals {
+  income: number;
+  expenses: number;
+}
+
+export default function IncomeExpenseChart({ transactions }: IncomeExpenseChartProps) {
+  const monthlyTotals = transactions.reduce<Record<string, MonthlyTotals>>((acc, transaction) => {
+    const month = transaction.date.slice(0, 7);
+
+    if (!acc[month]) {
+      acc[month] = {
+        income: 0,
+        expenses: 0,
+      };
+    }
+
+    if (transaction.type === "income") {
+      acc[month].income += transaction.amount;
+    } else {
+      acc[month].expenses += transaction.amount;
+    }
+
+    return acc;
+  }, {});
+
+  const data = Object.entries(monthlyTotals)
+    .sort(([monthA], [monthB]) => monthA.localeCompare(monthB))
+    .map(([month, totals]) => ({
+      month: new Intl.DateTimeFormat("en-CA", {
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(`${month}-01T00:00:00Z`)),
+      income: totals.income / 100,
+      expenses: totals.expenses / 100,
+    }));
+
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <h2 className="mb-6 text-lg font-semibold text-slate-900">Income vs Expenses</h2>

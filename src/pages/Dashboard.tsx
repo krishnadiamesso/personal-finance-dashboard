@@ -40,7 +40,7 @@ export default function Dashboard() {
       </section>
 
       <section aria-label="Finance Charts">
-        <IncomeExpenseChart />
+        <IncomeExpenseChart transactions={mockTransactions} />
       </section>
     </div>
   );
