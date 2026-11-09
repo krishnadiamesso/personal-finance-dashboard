@@ -4,10 +4,13 @@ import { useState } from "react";
 import type { TransactionCategory, TransactionType } from "../types/transaction.ts";
 import { ChevronDown } from "lucide-react";
 
+type SortOption = "newest" | "oldest" | "amount-high" | "amount-low";
+
 export default function Transactions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<TransactionType | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<TransactionCategory | "all">("all");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const categories = [
     ...new Set(mockTransactions.map((transaction) => transaction.category)),
@@ -18,6 +21,19 @@ export default function Transactions() {
     const matchesType = typeFilter === "all" || transaction.type === typeFilter;
     const matchesCategory = categoryFilter === "all" || transaction.category === categoryFilter;
     return matchesSearch && matchesType && matchesCategory;
+  });
+
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
+    switch (sortOption) {
+      case "newest":
+        return b.date.localeCompare(a.date);
+      case "oldest":
+        return a.date.localeCompare(b.date);
+      case "amount-high":
+        return b.amount - a.amount;
+      case "amount-low":
+        return a.amount - b.amount;
+    }
   });
 
   return (
@@ -83,8 +99,30 @@ export default function Transactions() {
             className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
           />
         </div>
+
+        <div className="relative">
+          <select
+            value={sortOption}
+            onChange={(event) => setSortOption(event.target.value as SortOption)}
+            aria-label="Sort transactions"
+            className="w-full appearance-none rounded-lg border border-slate-200 bg-white
+      py-3 pl-4 pr-10 text-sm text-slate-900
+      focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100
+      sm:w-48"
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="amount-high">Amount: high to low</option>
+            <option value="amount-low">Amount: low to high</option>
+          </select>
+          <ChevronDown
+            size={16}
+            aria-hidden="true"
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+          />
+        </div>
       </div>
-      <TransactionTable transactions={filteredTransactions} />
+      <TransactionTable transactions={sortedTransactions} />
     </div>
   );
 }
