@@ -3,6 +3,7 @@ import { mockTransactions } from "../data/mockData.ts";
 import { useState } from "react";
 import type { TransactionCategory, TransactionType } from "../types/transaction.ts";
 import { ChevronDown } from "lucide-react";
+import { TransactionForm } from "../components/TransactionForm.tsx";
 
 type SortOption = "newest" | "oldest" | "amount-high" | "amount-low";
 
@@ -122,6 +123,8 @@ export default function Transactions() {
           />
         </div>
       </div>
+
+      <TransactionForm />
       <TransactionTable transactions={sortedTransactions} />
     </div>
   );
