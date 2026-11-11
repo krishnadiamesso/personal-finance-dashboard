@@ -1,6 +1,7 @@
 import type {
   ExpenseCategory,
   IncomeCategory,
+  Transaction,
   TransactionCategory,
   TransactionType,
 } from "../types/transaction.ts";
@@ -91,7 +92,37 @@ export function TransactionForm() {
       return;
     }
 
-    console.log("Form is valid");
+    const baseTransaction = {
+      id: crypto.randomUUID(),
+      description: description.trim(),
+      amount: Math.round(Number(amount) * 100),
+      date: date.trim(),
+    };
+
+    let newTransaction: Transaction;
+
+    if (type === "income") {
+      newTransaction = {
+        ...baseTransaction,
+        type: "income",
+        category: category as IncomeCategory,
+      };
+    } else {
+      newTransaction = {
+        ...baseTransaction,
+        type: "expense",
+        category: category as ExpenseCategory,
+      };
+    }
+
+    setDescription("");
+    setAmount("");
+    setType("expense");
+    setCategory("food");
+    setDate("");
+    setErrors({});
+
+    console.log(newTransaction);
   }
 
   const availableCategories = type === "income" ? incomeCategories : expenseCategories;
