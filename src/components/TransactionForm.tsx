@@ -15,6 +15,10 @@ interface FormErrors {
   date?: string;
 }
 
+interface TransactionFormProps {
+  onAddTransaction: (transaction: Transaction) => void;
+}
+
 const incomeCategories: IncomeCategory[] = ["salary", "freelance", "investment", "gift", "other"];
 
 const expenseCategories: ExpenseCategory[] = [
@@ -47,7 +51,7 @@ function isValidAmount(value: string): boolean {
   );
 }
 
-export function TransactionForm() {
+export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<TransactionType>("expense");
@@ -122,7 +126,7 @@ export function TransactionForm() {
     setDate("");
     setErrors({});
 
-    console.log(newTransaction);
+    onAddTransaction(newTransaction);
   }
 
   const availableCategories = type === "income" ? incomeCategories : expenseCategories;
