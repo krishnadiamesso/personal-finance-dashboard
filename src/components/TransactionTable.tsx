@@ -1,15 +1,17 @@
 import type { Transaction } from "../types/transaction.ts";
 import { formatCurrency } from "../utils/currency.ts";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface TransactionTableProps {
   transactions: Transaction[];
   onEditTransaction?: (transaction: Transaction) => void;
+  onDeleteTransaction?: (transaction: Transaction) => void;
 }
 
 export default function TransactionTable({
   transactions,
   onEditTransaction,
+  onDeleteTransaction,
 }: TransactionTableProps) {
   return (
     <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -57,15 +59,26 @@ export default function TransactionTable({
                 {formatCurrency(transaction.amount)}
               </td>
               <td className="px-6 py-4">
-                <button
-                  type="button"
-                  onClick={() => onEditTransaction?.(transaction)}
-                  disabled={!onEditTransaction}
-                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
-                >
-                  <Pencil size={16} aria-hidden={true} />
-                  Edit
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onEditTransaction?.(transaction)}
+                    disabled={!onEditTransaction}
+                    className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
+                  >
+                    <Pencil size={16} aria-hidden={true} />
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDeleteTransaction?.(transaction)}
+                    disabled={!onDeleteTransaction}
+                    className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                  >
+                    <Trash2 size={16} aria-hidden="true" />
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
