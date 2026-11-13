@@ -62,6 +62,10 @@ export default function Transactions() {
 
     if (!confirmed) return;
 
+    if (editingTransaction?.id === deletedTransaction.id) {
+      setEditingTransaction(null)
+    }
+
     setTransactions((prevTransactions) =>
       prevTransactions.filter((transaction) => transaction.id !== deletedTransaction.id),
     );
