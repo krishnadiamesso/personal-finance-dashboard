@@ -45,9 +45,24 @@ export default function Transactions() {
     setEditingTransaction(transaction);
   }
 
+  function handleUpdateTransaction(updatedTransaction: Transaction) {
+    setTransactions((previousTransactions) =>
+      previousTransactions.map((transaction) =>
+        transaction.id === updatedTransaction.id ? updatedTransaction : transaction,
+      ),
+    );
+
+    setEditingTransaction(null);
+  }
+
   return (
     <div className="space-y-6">
-      <TransactionForm onAddTransaction={handleAddTransaction} />
+      <TransactionForm
+        onAddTransaction={handleAddTransaction}
+        transaction={editingTransaction}
+        key={editingTransaction?.id ?? "new"}
+        onUpdateTransaction={handleUpdateTransaction}
+      />
       {editingTransaction && (
         <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
           <p>

@@ -17,6 +17,8 @@ interface FormErrors {
 
 interface TransactionFormProps {
   onAddTransaction: (transaction: Transaction) => void;
+  onUpdateTransaction: (transaction: Transaction) => void;
+  transaction?: Transaction | null;
 }
 
 const incomeCategories: IncomeCategory[] = ["salary", "freelance", "investment", "gift", "other"];
@@ -51,12 +53,16 @@ function isValidAmount(value: string): boolean {
   );
 }
 
-export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState<TransactionType>("expense");
-  const [category, setCategory] = useState<TransactionCategory>("food");
-  const [date, setDate] = useState("");
+export function TransactionForm({
+  onAddTransaction,
+  transaction,
+  onUpdateTransaction,
+}: TransactionFormProps) {
+  const [description, setDescription] = useState(transaction?.description ?? "");
+  const [amount, setAmount] = useState(transaction ? (transaction.amount / 100).toFixed(2) : "");
+  const [type, setType] = useState<TransactionType>(transaction?.type ?? "expense");
+  const [category, setCategory] = useState<TransactionCategory>(transaction?.category ?? "food");
+  const [date, setDate] = useState(transaction?.date ?? "");
   const [errors, setErrors] = useState<FormErrors>({});
 
   function validateForm(): FormErrors {
@@ -97,7 +103,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
     }
 
     const baseTransaction = {
-      id: crypto.randomUUID(),
+      id: transaction?.id ?? crypto.randomUUID(),
       description: description.trim(),
       amount: Math.round(Number(amount) * 100),
       date: date.trim(),
@@ -119,14 +125,18 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
       };
     }
 
+    if (transaction) {
+      onUpdateTransaction(newTransaction);
+    } else {
+      onAddTransaction(newTransaction);
+    }
+
     setDescription("");
     setAmount("");
     setType("expense");
     setCategory("food");
     setDate("");
     setErrors({});
-
-    onAddTransaction(newTransaction);
   }
 
   const availableCategories = type === "income" ? incomeCategories : expenseCategories;
@@ -137,7 +147,9 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
       noValidate
       onSubmit={handleSubmit}
     >
-      <h2 className="text-lg font-semibold text-slate-900">Add Transaction</h2>
+      <h2 className="text-lg font-semibold text-slate-900">
+        {transaction ? "Edit Transaction" : "Add Transaction"}
+      </h2>
 
       <div className="space-y-1">
         <label htmlFor="description" className="block text-sm font-medium text-slate-700">
@@ -268,7 +280,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
         type="submit"
         className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
       >
-        Add Transaction
+        {transaction ? "Edit Transaction" : "Add Transaction"}
       </button>
     </form>
   );
