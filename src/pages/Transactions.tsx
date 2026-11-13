@@ -55,6 +55,18 @@ export default function Transactions() {
     setEditingTransaction(null);
   }
 
+  function handleDeleteTransaction(deletedTransaction: Transaction) {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${deletedTransaction.description}"?`,
+    );
+
+    if (!confirmed) return;
+
+    setTransactions((prevTransactions) =>
+      prevTransactions.filter((transaction) => transaction.id !== deletedTransaction.id),
+    );
+  }
+
   return (
     <div className="space-y-6">
       <TransactionForm
@@ -165,6 +177,7 @@ export default function Transactions() {
         <TransactionTable
           transactions={sortedTransactions}
           onEditTransaction={handleEditTransaction}
+          onDeleteTransaction={handleDeleteTransaction}
         />
       </div>
     </div>
