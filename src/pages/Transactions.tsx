@@ -15,6 +15,7 @@ export default function Transactions() {
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const categories = [...new Set(transactions.map((transaction) => transaction.category))].sort();
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
   const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = transaction.description.toLowerCase().includes(normalizedQuery);
@@ -40,9 +41,27 @@ export default function Transactions() {
     setTransactions((prevTransactions) => [newTransaction, ...prevTransactions]);
   }
 
+  function handleEditTransaction(transaction: Transaction) {
+    setEditingTransaction(transaction);
+  }
+
   return (
     <div className="space-y-6">
       <TransactionForm onAddTransaction={handleAddTransaction} />
+      {editingTransaction && (
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
+          <p>
+            Editing: <strong>{editingTransaction.description}</strong>
+          </p>
+          <button
+            type="button"
+            onClick={() => setEditingTransaction(null)}
+            className="mt-2 font-medium text-indigo-600 hover:underline"
+          >
+            Cancel editing
+          </button>
+        </div>
+      )}
       <div className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="flex-1">
@@ -128,7 +147,10 @@ export default function Transactions() {
             />
           </div>
         </div>
-        <TransactionTable transactions={sortedTransactions} />
+        <TransactionTable
+          transactions={sortedTransactions}
+          onEditTransaction={handleEditTransaction}
+        />
       </div>
     </div>
   );
