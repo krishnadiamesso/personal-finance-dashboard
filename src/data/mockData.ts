@@ -1,4 +1,6 @@
 import type { Transaction } from "../types/transaction.ts";
+import type { Budget } from "../types/budget.ts";
+
 export const mockTransactions: Transaction[] = [
   {
     id: "1",
@@ -95,5 +97,50 @@ export const mockTransactions: Transaction[] = [
     type: "expense",
     category: "utilities",
     date: "2026-11-05",
+  },
+];
+
+export const mockBudgets: Budget[] = [
+  {
+    id: "budget-001",
+    category: "food",
+    limit: 50000,
+    month: "2026-11",
+  },
+  {
+    id: "budget-002",
+    category: "housing",
+    limit: 180000,
+    month: "2026-11",
+  },
+  {
+    id: "budget-003",
+    category: "transportation",
+    limit: 20000,
+    month: "2026-11",
+  },
+  {
+    id: "budget-004",
+    category: "entertainment",
+    limit: 15000,
+    month: "2026-11",
+  },
+  {
+    id: "budget-005",
+    category: "shopping",
+    limit: 30000,
+    month: "2026-11",
+  },
+  {
+    id: "budget-006",
+    category: "food",
+    limit: 45000,
+    month: "2026-10",
+  },
+  {
+    id: "budget-007",
+    category: "entertainment",
+    limit: 10000,
+    month: "2026-10",
   },
 ];
