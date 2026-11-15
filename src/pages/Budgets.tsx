@@ -2,6 +2,8 @@ import { useState } from "react";
 import BudgetCard from "../components/BudgetCard.tsx";
 import { mockBudgets } from "../data/mockData.ts";
 import type { Transaction } from "../types/transaction.ts";
+import type { Budget } from "../types/budget.ts";
+import BudgetForm from "../components/BudgetForm.tsx";
 
 interface BudgetsProps {
   transactions: Transaction[];
@@ -9,18 +11,26 @@ interface BudgetsProps {
 
 export default function Budgets({ transactions }: BudgetsProps) {
   const [selectedMonth, setSelectedMonth] = useState("2026-11");
+  const [budgets, setBudgets] = useState<Budget[]>(mockBudgets);
 
-  const filteredBudgets = mockBudgets.filter((budget) => budget.month === selectedMonth);
+  const filteredBudgets = budgets.filter((budget) => budget.month === selectedMonth);
+
+  function handleAddBudget(newBudget: Budget) {
+    setBudgets((prevBudgets) => [...prevBudgets, newBudget]);
+    setSelectedMonth(newBudget.month);
+  }
 
   return (
     <div className="space-y-6">
+      <BudgetForm onAddBudget={handleAddBudget} />
+
       <div>
-        <label htmlFor="budget-month" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="budget-filter-month" className="block text-sm font-medium text-slate-700">
           Select month
         </label>
 
         <input
-          id="budget-month"
+          id="budget-filter-month"
           type="month"
           value={selectedMonth}
           onChange={(event) => setSelectedMonth(event.target.value)}

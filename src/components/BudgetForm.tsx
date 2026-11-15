@@ -1,10 +1,15 @@
 import type { ExpenseCategory } from "../types/transaction.ts";
 import { useState } from "react";
+import type { Budget } from "../types/budget.ts";
 
 interface BudgetFormErrors {
   category?: string;
   limit?: string;
   month?: string;
+}
+
+interface BudgetFormProps {
+  onAddBudget: (budget: Budget) => void;
 }
 
 const expenseCategories: ExpenseCategory[] = [
@@ -34,7 +39,7 @@ function isValidMonth(month: string): boolean {
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(month);
 }
 
-export default function BudgetForm() {
+export default function BudgetForm({ onAddBudget }: BudgetFormProps) {
   const [category, setCategory] = useState<ExpenseCategory>("food");
   const [limit, setLimit] = useState("");
   const [month, setMonth] = useState("");
@@ -68,7 +73,19 @@ export default function BudgetForm() {
       return;
     }
 
-    console.log("Budget form is valid");
+    const newBudget: Budget = {
+      id: crypto.randomUUID(),
+      category,
+      limit: Math.round(Number(limit) * 100),
+      month,
+    };
+
+    onAddBudget(newBudget);
+
+    setCategory("food");
+    setLimit("");
+    setMonth("");
+    setErrors({});
   }
 
   return (
