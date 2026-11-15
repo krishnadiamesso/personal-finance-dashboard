@@ -87,7 +87,7 @@ function App() {
           <Menu size={24} />
         </button>
         <Header title={pageTitles[currentPage]} subtitle={pageSubTitles[currentPage]} />
-        {currentPage === "dashboard" && <Dashboard />}
+        {currentPage === "dashboard" && <Dashboard transactions={transactions} />}
         {currentPage === "transactions" && (
           <Transactions transactions={transactions} setTransactions={setTransactions} />
         )}

@@ -5,12 +5,16 @@ import {
   calculateTotalExpenses,
   calculateTotalIncome,
 } from "../utils/calculations.ts";
-import { mockTransactions } from "../data/mockData.ts";
 import StatCard from "../components/StatCard.tsx";
 import { formatCurrency } from "../utils/currency.ts";
 import IncomeExpenseChart from "../components/IncomeExpenseChart.tsx";
+import type { Transaction } from "../types/transaction.ts";
 
 type DashboardMetric = "Balance" | "Total Income" | "Total Expenses" | "Savings Rate";
+
+interface DashboardProps {
+  transactions: Transaction[];
+}
 
 interface DashboardCard {
   title: DashboardMetric;
@@ -18,11 +22,11 @@ interface DashboardCard {
   icon: LucideIcon;
 }
 
-export default function Dashboard() {
-  const balance = calculateBalance(mockTransactions);
-  const income = calculateTotalIncome(mockTransactions);
-  const expenses = calculateTotalExpenses(mockTransactions);
-  const savingsRate = calculateSavingsRate(mockTransactions);
+export default function Dashboard({ transactions }: DashboardProps) {
+  const balance = calculateBalance(transactions);
+  const income = calculateTotalIncome(transactions);
+  const expenses = calculateTotalExpenses(transactions);
+  const savingsRate = calculateSavingsRate(transactions);
 
   const cards: DashboardCard[] = [
     { title: "Balance", value: formatCurrency(balance), icon: Wallet },
@@ -40,7 +44,7 @@ export default function Dashboard() {
       </section>
 
       <section aria-label="Finance Charts">
-        <IncomeExpenseChart transactions={mockTransactions} />
+        <IncomeExpenseChart transactions={transactions} />
       </section>
     </div>
   );
