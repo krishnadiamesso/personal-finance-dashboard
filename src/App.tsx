@@ -5,6 +5,8 @@ import Header from "./components/Header.tsx";
 import { Menu } from "lucide-react";
 import Dashboard from "./pages/Dashboard.tsx";
 import Transactions from "./pages/Transactions.tsx";
+import { mockTransactions } from "./data/mockData.ts";
+import type { Transaction } from "./types/transaction.ts";
 
 const pageTitles: Record<Page, string> = {
   dashboard: "Dashboard",
@@ -28,6 +30,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
 
   const closeSidebar = useCallback(() => {
     setIsSidebarOpen(false);
@@ -85,7 +88,9 @@ function App() {
         </button>
         <Header title={pageTitles[currentPage]} subtitle={pageSubTitles[currentPage]} />
         {currentPage === "dashboard" && <Dashboard />}
-        {currentPage === "transactions" && <Transactions />}
+        {currentPage === "transactions" && (
+          <Transactions transactions={transactions} setTransactions={setTransactions} />
+        )}
       </main>
     </div>
   );

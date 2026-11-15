@@ -1,19 +1,22 @@
 import TransactionTable from "../components/TransactionTable.tsx";
-import { mockTransactions } from "../data/mockData.ts";
 import { useState } from "react";
 import type { Transaction, TransactionCategory, TransactionType } from "../types/transaction.ts";
 import { ChevronDown } from "lucide-react";
 import { TransactionForm } from "../components/TransactionForm.tsx";
-
+import type { Dispatch, SetStateAction } from "react";
 type SortOption = "newest" | "oldest" | "amount-high" | "amount-low";
 
-export default function Transactions() {
+interface TransactionsProps {
+  transactions: Transaction[];
+  setTransactions: Dispatch<SetStateAction<Transaction[]>>;
+}
+
+export default function Transactions({ transactions, setTransactions }: TransactionsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<TransactionType | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<TransactionCategory | "all">("all");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const normalizedQuery = searchQuery.trim().toLowerCase();
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const categories = [...new Set(transactions.map((transaction) => transaction.category))].sort();
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
@@ -63,7 +66,7 @@ export default function Transactions() {
     if (!confirmed) return;
 
     if (editingTransaction?.id === deletedTransaction.id) {
-      setEditingTransaction(null)
+      setEditingTransaction(null);
     }
 
     setTransactions((prevTransactions) =>
