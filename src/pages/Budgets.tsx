@@ -37,9 +37,25 @@ export default function Budgets({ transactions, budgets, setBudgets }: BudgetsPr
   }
 
   function handleDeleteBudget(deletedBudget: Budget) {
+    const formattedMonth = new Intl.DateTimeFormat("en-CA", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${deletedBudget.month}-01T00:00:00Z`));
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete the ${deletedBudget.category} budget for ${formattedMonth}?`,
+    );
+
+    if (!confirmed) return;
+
     setBudgets((prevBudgets) =>
       prevBudgets.filter((prevBudget) => prevBudget.id !== deletedBudget.id),
     );
+
+    if (editingBudget?.id === deletedBudget.id) {
+      setEditingBudget(null);
+    }
   }
 
   return (
