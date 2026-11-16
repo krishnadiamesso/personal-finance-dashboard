@@ -21,8 +21,8 @@ export default function Budgets({ transactions }: BudgetsProps) {
     setSelectedMonth(newBudget.month);
   }
 
-  function handleEditBudget(editBudget: Budget) {
-    setEditingBudget(editBudget);
+  function handleEditBudget(budget: Budget) {
+    setEditingBudget(budget);
   }
 
   return (
