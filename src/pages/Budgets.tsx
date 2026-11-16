@@ -25,12 +25,24 @@ export default function Budgets({ transactions }: BudgetsProps) {
     setEditingBudget(budget);
   }
 
+  function handleUpdateBudget(updatedBudget: Budget) {
+    setBudgets((prevBudgets) =>
+      prevBudgets.map((prevBudget) =>
+        prevBudget.id === updatedBudget.id ? updatedBudget : prevBudget,
+      ),
+    );
+
+    setEditingBudget(null);
+    setSelectedMonth(updatedBudget.month);
+  }
+
   return (
     <div className="space-y-6">
       <BudgetForm
         onAddBudget={handleAddBudget}
         budget={editingBudget}
         key={editingBudget?.id ?? "new"}
+        onUpdateBudget={handleUpdateBudget}
       />
 
       {editingBudget && (

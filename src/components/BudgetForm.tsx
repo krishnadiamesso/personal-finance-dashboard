@@ -10,6 +10,7 @@ interface BudgetFormErrors {
 
 interface BudgetFormProps {
   onAddBudget: (budget: Budget) => void;
+  onUpdateBudget: (budget: Budget) => void;
   budget?: Budget | null;
 }
 
@@ -40,7 +41,7 @@ function isValidMonth(month: string): boolean {
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(month);
 }
 
-export default function BudgetForm({ onAddBudget, budget }: BudgetFormProps) {
+export default function BudgetForm({ onAddBudget, onUpdateBudget, budget }: BudgetFormProps) {
   const [category, setCategory] = useState<ExpenseCategory>(budget?.category ?? "food");
   const [limit, setLimit] = useState(budget ? (budget.limit / 100).toFixed(2) : "");
   const [month, setMonth] = useState(budget?.month ?? "");
@@ -74,19 +75,23 @@ export default function BudgetForm({ onAddBudget, budget }: BudgetFormProps) {
       return;
     }
 
-    const newBudget: Budget = {
-      id: crypto.randomUUID(),
+    const savedBudget: Budget = {
+      id: budget?.id ?? crypto.randomUUID(),
       category,
       limit: Math.round(Number(limit) * 100),
       month,
     };
 
-    onAddBudget(newBudget);
+    if (budget) {
+      onUpdateBudget(savedBudget);
+    } else {
+      onAddBudget(savedBudget);
 
-    setCategory("food");
-    setLimit("");
-    setMonth("");
-    setErrors({});
+      setCategory("food");
+      setLimit("");
+      setMonth("");
+      setErrors({});
+    }
   }
 
   return (
@@ -179,8 +184,7 @@ export default function BudgetForm({ onAddBudget, budget }: BudgetFormProps) {
 
       <button
         type="submit"
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-        disabled={Boolean(budget)}
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
       >
         {budget ? "Edit Budget" : "Create Budget"}
       </button>
