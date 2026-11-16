@@ -6,15 +6,21 @@ import {
   calculateBudgetRemaining,
   calculateBudgetSpent,
 } from "../utils/budgetCalculations.ts";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface BudgetCardProps {
   budget: Budget;
   transactions: Transaction[];
   onEditBudget?: (budget: Budget) => void;
+  onDeleteBudget?: (budget: Budget) => void;
 }
 
-export default function BudgetCard({ budget, transactions, onEditBudget }: BudgetCardProps) {
+export default function BudgetCard({
+  budget,
+  transactions,
+  onEditBudget,
+  onDeleteBudget,
+}: BudgetCardProps) {
   const spent = calculateBudgetSpent(budget, transactions);
   const remaining = calculateBudgetRemaining(budget, transactions);
   const percentage = calculateBudgetPercentage(budget, transactions);
@@ -74,15 +80,26 @@ export default function BudgetCard({ budget, transactions, onEditBudget }: Budge
         <p className="text-xs text-slate-500">Monthly limit: {formatCurrency(budget.limit)}</p>
       </div>
 
-      <button
-        type="button"
-        onClick={() => onEditBudget?.(budget)}
-        disabled={!onEditBudget}
-        className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
-      >
-        <Pencil size={16} aria-hidden="true" />
-        Edit Budget
-      </button>
+      <div className="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => onEditBudget?.(budget)}
+          disabled={!onEditBudget}
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
+        >
+          <Pencil size={16} aria-hidden="true" />
+          Edit Budget
+        </button>
+        <button
+          type="button"
+          onClick={() => onDeleteBudget?.(budget)}
+          disabled={!onDeleteBudget}
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+        >
+          <Trash2 size={16} aria-hidden="true" />
+          Delete
+        </button>
+      </div>
     </div>
   );
 }
