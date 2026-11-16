@@ -1,17 +1,17 @@
-import { useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import BudgetCard from "../components/BudgetCard.tsx";
-import { mockBudgets } from "../data/mockData.ts";
 import type { Transaction } from "../types/transaction.ts";
 import type { Budget } from "../types/budget.ts";
 import BudgetForm from "../components/BudgetForm.tsx";
 
 interface BudgetsProps {
   transactions: Transaction[];
+  budgets: Budget[];
+  setBudgets: Dispatch<SetStateAction<Budget[]>>;
 }
 
-export default function Budgets({ transactions }: BudgetsProps) {
+export default function Budgets({ transactions, budgets, setBudgets }: BudgetsProps) {
   const [selectedMonth, setSelectedMonth] = useState("2026-11");
-  const [budgets, setBudgets] = useState<Budget[]>(mockBudgets);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
 
   const filteredBudgets = budgets.filter((budget) => budget.month === selectedMonth);
@@ -39,11 +39,11 @@ export default function Budgets({ transactions }: BudgetsProps) {
   return (
     <div className="space-y-6">
       <BudgetForm
-        onAddBudget={handleAddBudget}
-        budget={editingBudget}
         key={editingBudget?.id ?? "new"}
-        onUpdateBudget={handleUpdateBudget}
+        budget={editingBudget}
         existingBudgets={budgets}
+        onAddBudget={handleAddBudget}
+        onUpdateBudget={handleUpdateBudget}
       />
 
       {editingBudget && (

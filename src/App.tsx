@@ -5,9 +5,10 @@ import Header from "./components/Header.tsx";
 import { Menu } from "lucide-react";
 import Dashboard from "./pages/Dashboard.tsx";
 import Transactions from "./pages/Transactions.tsx";
-import { mockTransactions } from "./data/mockData.ts";
+import { mockBudgets, mockTransactions } from "./data/mockData.ts";
 import type { Transaction } from "./types/transaction.ts";
 import Budgets from "./pages/Budgets.tsx";
+import type { Budget } from "./types/budget.ts";
 
 const pageTitles: Record<Page, string> = {
   dashboard: "Dashboard",
@@ -32,6 +33,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const [budgets, setBudgets] = useState<Budget[]>(mockBudgets);
 
   const closeSidebar = useCallback(() => {
     setIsSidebarOpen(false);
@@ -92,7 +94,9 @@ function App() {
         {currentPage === "transactions" && (
           <Transactions transactions={transactions} setTransactions={setTransactions} />
         )}
-        {currentPage === "budgets" && <Budgets transactions={transactions} />}
+        {currentPage === "budgets" && (
+          <Budgets transactions={transactions} budgets={budgets} setBudgets={setBudgets} />
+        )}
       </main>
     </div>
   );
