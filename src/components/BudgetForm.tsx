@@ -12,6 +12,7 @@ interface BudgetFormProps {
   onAddBudget: (budget: Budget) => void;
   onUpdateBudget: (budget: Budget) => void;
   budget?: Budget | null;
+  existingBudgets: Budget[];
 }
 
 const expenseCategories: ExpenseCategory[] = [
@@ -41,7 +42,12 @@ function isValidMonth(month: string): boolean {
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(month);
 }
 
-export default function BudgetForm({ onAddBudget, onUpdateBudget, budget }: BudgetFormProps) {
+export default function BudgetForm({
+  onAddBudget,
+  onUpdateBudget,
+  budget,
+  existingBudgets,
+}: BudgetFormProps) {
   const [category, setCategory] = useState<ExpenseCategory>(budget?.category ?? "food");
   const [limit, setLimit] = useState(budget ? (budget.limit / 100).toFixed(2) : "");
   const [month, setMonth] = useState(budget?.month ?? "");
@@ -50,8 +56,17 @@ export default function BudgetForm({ onAddBudget, onUpdateBudget, budget }: Budg
   function validateForm(): BudgetFormErrors {
     const newErrors: BudgetFormErrors = {};
 
+    const duplicateBudget = existingBudgets.some(
+      (existingBudget) =>
+        existingBudget.category === category &&
+        existingBudget.month === month &&
+        existingBudget.id !== budget?.id,
+    );
+
     if (!isValidCategory(category)) {
       newErrors.category = "Invalid category selected.";
+    } else if (duplicateBudget) {
+      newErrors.category = "A budget already exists for this category and month.";
     }
 
     if (!isValidLimit(limit)) {

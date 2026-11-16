@@ -43,6 +43,7 @@ export default function Budgets({ transactions }: BudgetsProps) {
         budget={editingBudget}
         key={editingBudget?.id ?? "new"}
         onUpdateBudget={handleUpdateBudget}
+        existingBudgets={budgets}
       />
 
       {editingBudget && (
