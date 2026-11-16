@@ -12,6 +12,7 @@ interface BudgetsProps {
 export default function Budgets({ transactions }: BudgetsProps) {
   const [selectedMonth, setSelectedMonth] = useState("2026-11");
   const [budgets, setBudgets] = useState<Budget[]>(mockBudgets);
+  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
 
   const filteredBudgets = budgets.filter((budget) => budget.month === selectedMonth);
 
@@ -20,9 +21,31 @@ export default function Budgets({ transactions }: BudgetsProps) {
     setSelectedMonth(newBudget.month);
   }
 
+  function handleEditBudget(editBudget: Budget) {
+    setEditingBudget(editBudget);
+  }
+
   return (
     <div className="space-y-6">
       <BudgetForm onAddBudget={handleAddBudget} />
+
+      {editingBudget && (
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
+          <p>
+            Editing budget: <strong>{editingBudget.category}</strong>
+            {" — "}
+            {editingBudget.month}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setEditingBudget(null)}
+            className="mt-2 font-medium text-indigo-600 hover:underline"
+          >
+            Cancel editing
+          </button>
+        </div>
+      )}
 
       <div>
         <label htmlFor="budget-filter-month" className="block text-sm font-medium text-slate-700">
@@ -40,7 +63,12 @@ export default function Budgets({ transactions }: BudgetsProps) {
       {filteredBudgets.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredBudgets.map((budget) => (
-            <BudgetCard key={budget.id} budget={budget} transactions={transactions} />
+            <BudgetCard
+              key={budget.id}
+              budget={budget}
+              transactions={transactions}
+              onEditBudget={handleEditBudget}
+            />
           ))}
         </div>
       ) : (
