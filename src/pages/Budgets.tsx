@@ -36,6 +36,12 @@ export default function Budgets({ transactions, budgets, setBudgets }: BudgetsPr
     setSelectedMonth(updatedBudget.month);
   }
 
+  function handleDeleteBudget(deletedBudget: Budget) {
+    setBudgets((prevBudgets) =>
+      prevBudgets.filter((prevBudget) => prevBudget.id !== deletedBudget.id),
+    );
+  }
+
   return (
     <div className="space-y-6">
       <BudgetForm
@@ -88,6 +94,7 @@ export default function Budgets({ transactions, budgets, setBudgets }: BudgetsPr
               budget={budget}
               transactions={transactions}
               onEditBudget={handleEditBudget}
+              onDeleteBudget={handleDeleteBudget}
             />
           ))}
         </div>
