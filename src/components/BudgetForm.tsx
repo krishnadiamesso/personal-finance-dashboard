@@ -10,6 +10,7 @@ interface BudgetFormErrors {
 
 interface BudgetFormProps {
   onAddBudget: (budget: Budget) => void;
+  budget?: Budget | null;
 }
 
 const expenseCategories: ExpenseCategory[] = [
@@ -39,10 +40,10 @@ function isValidMonth(month: string): boolean {
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(month);
 }
 
-export default function BudgetForm({ onAddBudget }: BudgetFormProps) {
-  const [category, setCategory] = useState<ExpenseCategory>("food");
-  const [limit, setLimit] = useState("");
-  const [month, setMonth] = useState("");
+export default function BudgetForm({ onAddBudget, budget }: BudgetFormProps) {
+  const [category, setCategory] = useState<ExpenseCategory>(budget?.category ?? "food");
+  const [limit, setLimit] = useState(budget ? (budget.limit / 100).toFixed(2) : "");
+  const [month, setMonth] = useState(budget?.month ?? "");
   const [errors, setErrors] = useState<BudgetFormErrors>({});
 
   function validateForm(): BudgetFormErrors {
@@ -94,7 +95,9 @@ export default function BudgetForm({ onAddBudget }: BudgetFormProps) {
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
     >
-      <h2 className="text-lg font-semibold text-slate-900">Create Budget</h2>
+      <h2 className="text-lg font-semibold text-slate-900">
+        {budget ? "Edit Budget" : "Create Budget"}
+      </h2>
 
       <div className="space-y-1">
         <label htmlFor="budget-category" className="block text-sm font-medium text-slate-700">
@@ -176,9 +179,10 @@ export default function BudgetForm({ onAddBudget }: BudgetFormProps) {
 
       <button
         type="submit"
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+        disabled={Boolean(budget)}
       >
-        Create Budget
+        {budget ? "Edit Budget" : "Create Budget"}
       </button>
     </form>
   );

@@ -27,12 +27,19 @@ export default function Budgets({ transactions }: BudgetsProps) {
 
   return (
     <div className="space-y-6">
-      <BudgetForm onAddBudget={handleAddBudget} />
+      <BudgetForm
+        onAddBudget={handleAddBudget}
+        budget={editingBudget}
+        key={editingBudget?.id ?? "new"}
+      />
 
       {editingBudget && (
         <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
           <p>
-            Editing budget: <strong>{editingBudget.category}</strong>
+            Editing budget:{" "}
+            <strong>
+              {editingBudget.category.charAt(0).toUpperCase() + editingBudget.category.slice(1)}
+            </strong>
             {" — "}
             {editingBudget.month}
           </p>
