@@ -1,9 +1,14 @@
-import type { Transaction } from "../types/transaction.ts";
+import type { ExpenseCategory, Transaction } from "../types/transaction.ts";
 
 export interface MonthlySummary {
   month: string;
   income: number;
   expenses: number;
+}
+
+export interface CategorySummary {
+  category: ExpenseCategory;
+  total: number;
 }
 
 export function calculateMonthlySummary(transactions: Transaction[]): MonthlySummary[] {
@@ -32,4 +37,25 @@ export function calculateMonthlySummary(transactions: Transaction[]): MonthlySum
   }
 
   return Array.from(summaries.values()).sort((a, b) => a.month.localeCompare(b.month));
+}
+
+export function calculateSpendingByCategory(transactions: Transaction[]): CategorySummary[] {
+  const expensesTransactions = transactions.filter((transaction) => transaction.type === "expense");
+
+  const summaries = new Map<ExpenseCategory, number>();
+
+  for (const transaction of expensesTransactions) {
+    const category = transaction.category;
+
+    const currentTotal = summaries.get(category) ?? 0;
+
+    summaries.set(category, currentTotal + transaction.amount);
+  }
+
+  const result: CategorySummary[] = Array.from(summaries.entries()).map(([category, total]) => ({
+    category,
+    total,
+  }));
+
+  return result.sort((a, b) => b.total - a.total)
 }
