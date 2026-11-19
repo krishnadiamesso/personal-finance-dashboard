@@ -9,6 +9,7 @@ import { mockBudgets, mockTransactions } from "./data/mockData.ts";
 import type { Transaction } from "./types/transaction.ts";
 import Budgets from "./pages/Budgets.tsx";
 import type { Budget } from "./types/budget.ts";
+import Analytics from "./pages/Analytics.tsx";
 
 const pageTitles: Record<Page, string> = {
   dashboard: "Dashboard",
@@ -97,6 +98,7 @@ function App() {
         {currentPage === "budgets" && (
           <Budgets transactions={transactions} budgets={budgets} setBudgets={setBudgets} />
         )}
+        {currentPage === "analytics" && <Analytics transactions={transactions} />}
       </main>
     </div>
   );
