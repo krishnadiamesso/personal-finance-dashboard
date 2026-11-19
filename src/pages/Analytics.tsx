@@ -1,10 +1,15 @@
 import type { Transaction } from "../types/transaction.ts";
-import { calculateMonthlySummary } from "../utils/analyticsCalculations.ts";
+import {
+  calculateMonthlySummary,
+  calculateSpendingByCategory,
+} from "../utils/analyticsCalculations.ts";
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Legend,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -15,8 +20,26 @@ interface AnalyticsProps {
   transactions: Transaction[];
 }
 
+const CATEGORY_COLORS = [
+  "#6366f1",
+  "#f59e0b",
+  "#10b981",
+  "#ef4444",
+  "#8b5cf6",
+  "#06b6d4",
+  "#ec4899",
+  "#84cc16",
+];
+
 export default function Analytics({ transactions }: AnalyticsProps) {
   const monthlySummary = calculateMonthlySummary(transactions);
+  const categorySummary = calculateSpendingByCategory(transactions);
+
+  const categoryChartData = categorySummary.map((summary, index) => ({
+    name: summary.category.charAt(0).toUpperCase() + summary.category.slice(1),
+    value: summary.total / 100,
+    fill: CATEGORY_COLORS[index % CATEGORY_COLORS.length],
+  }));
 
   const chartData = monthlySummary.map((summary) => ({
     month: new Intl.DateTimeFormat("en-CA", {
@@ -105,9 +128,30 @@ export default function Analytics({ transactions }: AnalyticsProps) {
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-900">Spending by Category</h2>
 
-        <p className="mt-4 text-sm text-slate-500">
-          Spending by Category: container for a future pie/donut chart chart will appear here.
-        </p>
+        {categoryChartData.length === 0 ? (
+          <p className="mt-4 text-sm text-slate-500">No expense data available.</p>
+        ) : (
+          <div className="mt-6 h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={categoryChartData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={65}
+                  outerRadius={100}
+                  paddingAngle={3}
+                />
+
+                <Tooltip />
+
+                <Legend position="bottom" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
