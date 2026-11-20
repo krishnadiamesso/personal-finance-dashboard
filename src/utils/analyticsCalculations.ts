@@ -57,5 +57,22 @@ export function calculateSpendingByCategory(transactions: Transaction[]): Catego
     total,
   }));
 
-  return result.sort((a, b) => b.total - a.total)
+  return result.sort((a, b) => b.total - a.total);
+}
+
+export function filterTransactionsByDate(
+  transactions: Transaction[],
+  startDate: string,
+  endDate: string,
+): Transaction[] {
+  if (startDate && endDate && startDate > endDate) {
+    return [];
+  }
+
+  return transactions.filter((transaction) => {
+    const isAfterStart = startDate === "" || transaction.date >= startDate;
+    const isBeforeEnd = endDate === "" || transaction.date <= endDate;
+
+    return isAfterStart && isBeforeEnd;
+  });
 }
