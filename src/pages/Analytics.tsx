@@ -15,6 +15,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useState } from "react";
 
 interface AnalyticsProps {
   transactions: Transaction[];
@@ -34,6 +35,9 @@ const CATEGORY_COLORS = [
 export default function Analytics({ transactions }: AnalyticsProps) {
   const monthlySummary = calculateMonthlySummary(transactions);
   const categorySummary = calculateSpendingByCategory(transactions);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const isInvalidRange = Boolean(startDate && endDate && startDate > endDate);
 
   const categoryChartData = categorySummary.map((summary, index) => ({
     name: summary.category.charAt(0).toUpperCase() + summary.category.slice(1),
@@ -54,6 +58,64 @@ export default function Analytics({ transactions }: AnalyticsProps) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-500">Analyzing {transactions.length} transactions</p>
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-900">Date range</h2>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <label
+              htmlFor="analytics-start-date"
+              className="block text-sm font-medium text-slate-700"
+            >
+              Start date
+            </label>
+
+            <input
+              id="analytics-start-date"
+              type="date"
+              value={startDate}
+              onChange={(event) => setStartDate(event.target.value)}
+              aria-invalid={isInvalidRange}
+              aria-describedby={isInvalidRange ? "analytics-date-error" : undefined}
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label
+              htmlFor="analytics-end-date"
+              className="block text-sm font-medium text-slate-700"
+            >
+              End date
+            </label>
+
+            <input
+              id="analytics-end-date"
+              type="date"
+              value={endDate}
+              onChange={(event) => setEndDate(event.target.value)}
+              aria-invalid={isInvalidRange}
+              aria-describedby={isInvalidRange ? "analytics-date-error" : undefined}
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+          {isInvalidRange && (
+            <p id="analytics-date-error" role="alert" className="mt-3 text-sm text-red-600">
+              Start date must not be later than end date.
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setStartDate("");
+            setEndDate("");
+          }}
+          className="mt-4 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          Clear dates
+        </button>
+      </section>
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {["Total Income", "Total Expenses", "Net Savings", "Savings Rate"].map((title) => (
           <div key={title} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -152,14 +214,6 @@ export default function Analytics({ transactions }: AnalyticsProps) {
             </ResponsiveContainer>
           </div>
         )}
-      </section>
-
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">Date range</h2>
-
-        <p className="mt-4 text-sm text-slate-500">
-          Date range: placeholder for a future period selector. chart chart will appear here.
-        </p>
       </section>
     </div>
   );
