@@ -10,14 +10,14 @@ export function calculateTotalExpenses(transactions: Transaction[]): number {
   return expenseTransactions.reduce((total, transaction) => total + transaction.amount, 0);
 }
 
-export function calculateBalance(transactions: Transaction[]): number {
+export function calculateTotalBalance(transactions: Transaction[]): number {
   return calculateTotalIncome(transactions) - calculateTotalExpenses(transactions);
 }
 
 export function calculateSavingsRate(transactions: Transaction[]): number {
-  const income = calculateTotalIncome(transactions)
+  const income = calculateTotalIncome(transactions);
 
-  if (income === 0) return 0
+  if (income === 0) return 0;
 
-  return (calculateBalance(transactions) / income) * 100;
+  return (calculateTotalBalance(transactions) / income) * 100;
 }

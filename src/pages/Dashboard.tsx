@@ -1,6 +1,6 @@
 import { type LucideIcon, PiggyBank, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import {
-  calculateBalance,
+  calculateTotalBalance,
   calculateSavingsRate,
   calculateTotalExpenses,
   calculateTotalIncome,
@@ -23,7 +23,7 @@ interface DashboardCard {
 }
 
 export default function Dashboard({ transactions }: DashboardProps) {
-  const balance = calculateBalance(transactions);
+  const balance = calculateTotalBalance(transactions);
   const income = calculateTotalIncome(transactions);
   const expenses = calculateTotalExpenses(transactions);
   const savingsRate = calculateSavingsRate(transactions);

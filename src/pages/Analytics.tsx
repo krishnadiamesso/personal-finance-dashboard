@@ -2,6 +2,7 @@ import type { Transaction } from "../types/transaction.ts";
 import {
   calculateMonthlySummary,
   calculateSpendingByCategory,
+  filterTransactionsByDate,
 } from "../utils/analyticsCalculations.ts";
 import {
   Bar,
@@ -16,6 +17,13 @@ import {
   YAxis,
 } from "recharts";
 import { useState } from "react";
+import { formatCurrency } from "../utils/currency.ts";
+import {
+  calculateSavingsRate,
+  calculateTotalBalance,
+  calculateTotalExpenses,
+  calculateTotalIncome,
+} from "../utils/calculations.ts";
 
 interface AnalyticsProps {
   transactions: Transaction[];
@@ -33,11 +41,37 @@ const CATEGORY_COLORS = [
 ];
 
 export default function Analytics({ transactions }: AnalyticsProps) {
-  const monthlySummary = calculateMonthlySummary(transactions);
-  const categorySummary = calculateSpendingByCategory(transactions);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const isInvalidRange = Boolean(startDate && endDate && startDate > endDate);
+
+  const filteredTransactions = filterTransactionsByDate(transactions, startDate, endDate);
+  const monthlySummary = calculateMonthlySummary(filteredTransactions);
+  const categorySummary = calculateSpendingByCategory(filteredTransactions);
+
+  const totalIncome = calculateTotalIncome(filteredTransactions);
+  const totalExpenses = calculateTotalExpenses(filteredTransactions);
+  const netSavings = calculateTotalBalance(filteredTransactions);
+  const savingsRate = calculateSavingsRate(filteredTransactions);
+
+  const summaryCards = [
+    {
+      title: "Total Income",
+      value: formatCurrency(totalIncome),
+    },
+    {
+      title: "Total Expenses",
+      value: formatCurrency(totalExpenses),
+    },
+    {
+      title: "Net Savings",
+      value: formatCurrency(netSavings),
+    },
+    {
+      title: "Savings Rate",
+      value: `${savingsRate.toFixed(1)}%`,
+    },
+  ];
 
   const categoryChartData = categorySummary.map((summary, index) => ({
     name: summary.category.charAt(0).toUpperCase() + summary.category.slice(1),
@@ -57,7 +91,11 @@ export default function Analytics({ transactions }: AnalyticsProps) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-slate-500">Analyzing {transactions.length} transactions</p>
+      {!isInvalidRange && (
+        <p className="text-sm text-slate-500">
+          Analyzing {filteredTransactions.length} transactions
+        </p>
+      )}
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-900">Date range</h2>
 
@@ -99,12 +137,12 @@ export default function Analytics({ transactions }: AnalyticsProps) {
               className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
             />
           </div>
-          {isInvalidRange && (
-            <p id="analytics-date-error" role="alert" className="mt-3 text-sm text-red-600">
-              Start date must not be later than end date.
-            </p>
-          )}
         </div>
+        {isInvalidRange && (
+          <p id="analytics-date-error" role="alert" className="mt-3 text-sm text-red-600">
+            Start date must not be later than end date.
+          </p>
+        )}
         <button
           type="button"
           onClick={() => {
@@ -116,105 +154,116 @@ export default function Analytics({ transactions }: AnalyticsProps) {
           Clear dates
         </button>
       </section>
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {["Total Income", "Total Expenses", "Net Savings", "Savings Rate"].map((title) => (
-          <div key={title} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-medium text-slate-500">{title}</h2>
-            <p className="mt-2 text-2xl font-semibold text-slate-900">—</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">Income vs. Expenses</h2>
-
-        {chartData.length === 0 ? (
-          <p className="mt-4 text-sm text-slate-500">
-            No transaction data available for this chart.
-          </p>
-        ) : (
-          <div className="mt-6 h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={chartData}
-                barGap={8}
-                barCategoryGap="30%"
-                margin={{
-                  top: 20,
-                  right: 20,
-                  left: 0,
-                  bottom: 5,
-                }}
+      {!isInvalidRange && (
+        <>
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {summaryCards.map((summaryCard) => (
+              <div
+                key={summaryCard.title}
+                className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
               >
-                {/* Grid lines background */}
-                <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
+                <h2 className="text-sm font-medium text-slate-500">{summaryCard.title}</h2>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">{summaryCard.value}</p>
+              </div>
+            ))}
+          </section>
 
-                {/* X Axis bound to the 'month' property of the dataset */}
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                />
+          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900">Income vs. Expenses</h2>
 
-                {/* Y Axis automatically scales based on data values */}
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+            {chartData.length === 0 ? (
+              <p className="mt-4 text-sm text-slate-500">
+                No transaction data available for this chart.
+              </p>
+            ) : (
+              <div className="mt-6 h-80 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    barGap={8}
+                    barCategoryGap="30%"
+                    margin={{
+                      top: 20,
+                      right: 20,
+                      left: 0,
+                      bottom: 5,
+                    }}
+                  >
+                    {/* Grid lines background */}
+                    <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
 
-                {/* Interactive hover tooltip */}
-                <Tooltip cursor={{ fill: "rgba(0, 0, 0, 0.05)" }} />
+                    {/* X Axis bound to the 'month' property of the dataset */}
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: "#64748b", fontSize: 12 }}
+                    />
 
-                {/* Chart legend */}
-                <Legend position="bottom" height={36} iconType="circle" />
+                    {/* Y Axis automatically scales based on data values */}
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: "#64748b", fontSize: 12 }}
+                    />
 
-                {/* Bar Data Series */}
-                <Bar
-                  dataKey="income"
-                  fill="#6366f1"
-                  maxBarSize={40}
-                  radius={[4, 4, 0, 0]}
-                  name="Income"
-                />
-                <Bar
-                  dataKey="expenses"
-                  fill="#f59e0b"
-                  maxBarSize={40}
-                  radius={[4, 4, 0, 0]}
-                  name="Expenses"
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </section>
+                    {/* Interactive hover tooltip */}
+                    <Tooltip cursor={{ fill: "rgba(0, 0, 0, 0.05)" }} />
 
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">Spending by Category</h2>
+                    {/* Chart legend */}
+                    <Legend position="bottom" height={36} iconType="circle" />
 
-        {categoryChartData.length === 0 ? (
-          <p className="mt-4 text-sm text-slate-500">No expense data available.</p>
-        ) : (
-          <div className="mt-6 h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={categoryChartData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={65}
-                  outerRadius={100}
-                  paddingAngle={3}
-                />
+                    {/* Bar Data Series */}
+                    <Bar
+                      dataKey="income"
+                      fill="#6366f1"
+                      maxBarSize={40}
+                      radius={[4, 4, 0, 0]}
+                      name="Income"
+                    />
+                    <Bar
+                      dataKey="expenses"
+                      fill="#f59e0b"
+                      maxBarSize={40}
+                      radius={[4, 4, 0, 0]}
+                      name="Expenses"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </section>
 
-                <Tooltip />
+          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900">Spending by Category</h2>
 
-                <Legend position="bottom" />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </section>
+            {categoryChartData.length === 0 ? (
+              <p className="mt-4 text-sm text-slate-500">No expense data available.</p>
+            ) : (
+              <div className="mt-6 h-80 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryChartData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={65}
+                      outerRadius={100}
+                      paddingAngle={3}
+                    />
+
+                    <Tooltip />
+
+                    <Legend position="bottom" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
 }
